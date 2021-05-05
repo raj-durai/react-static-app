@@ -1,0 +1,18 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo List directory files...
+      - ls
+      - echo Installing source NPM dependencies...
+      - npm install
+  build:
+    commands:
+      - echo List active directory...
+      - ls
+      - echo Build started on `date`
+      - npm run build
+artifacts:
+  files:
+    - ./build/*
