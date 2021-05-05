@@ -1,18 +1,22 @@
 version: 0.2
 
 phases:
-  pre_build:
+  install:
+    runtime-versions:
+      nodejs: 12
     commands:
-      - echo List directory files...
-      - ls
       - echo Installing source NPM dependencies...
-      - npm install
+      - yarn install
   build:
     commands:
-      - echo List active directory...
-      - ls
       - echo Build started on `date`
-      - npm run build
+      - yarn build
+
 artifacts:
+  base-directory: ./build
   files:
-    - ./build/*
+    - '**/*'
+
+cache:
+  paths:
+    - './node_modules/**/*'
