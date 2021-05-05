@@ -7,8 +7,18 @@ phases:
     commands:
       - echo Installing source NPM dependencies...
       - yarn install
+      - yarn add wait-on pm2
+      - apt-get update -y && apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
+      - yarn install mocha mochawesome mochawesome-merge mochawesome-report-generator
+      - yarn pm2 start yarn -- start
+      - 'npx wait-on http://localhost:3000'
+  pre_build:
+    commands:
+      - 'npx cypress run --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"'
   build:
     commands:
+      - npx mochawesome-merge cypress/report/mochawesome-report/mochawesome*.json > cypress/report/mochawesome.json
+      - npx pm2 kill
       - echo Build started on `date`
       - yarn build
 
@@ -20,28 +30,3 @@ artifacts:
 cache:
   paths:
     - './node_modules/**/*'
-
-test:
-  artifacts:
-    baseDirectory: cypress
-    configFilePath: '**/mochawesome.json'
-    files:
-      - '**/*.png'
-      - '**/*.mp4'
-  phases:
-    preTest:
-      commands:
-        - npm ci
-        - npm install wait-on
-        - npm install pm2
-        - apt-get update -y && apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
-        - npm install mocha mochawesome mochawesome-merge mochawesome-report-generator
-        - npx pm2 start npm -- start
-        - 'npx wait-on http://localhost:3000'
-    test:
-      commands:
-        - 'npx cypress run --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"'
-    postTest:
-      commands:
-        - npx mochawesome-merge cypress/report/mochawesome-report/mochawesome*.json > cypress/report/mochawesome.json
-        - npx pm2 kill
