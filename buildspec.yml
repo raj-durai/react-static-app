@@ -10,7 +10,7 @@ phases:
       - yarn add wait-on pm2
       - apt-get update -y && apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
       - yarn add mocha mochawesome mochawesome-merge mochawesome-report-generator
-      - yarn pm2 start yarn -- start
+      - yarn pm2 start yarn start
       - 'npx wait-on http://localhost:3000'
   pre_build:
     commands:
