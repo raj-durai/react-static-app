@@ -9,7 +9,7 @@ function App() {
         <h2>
           Welcome to S3 world!
         </h2>
-        <p>This is hosted in S3 serverless.</p>
+        <p>This is hosted in S3 serverless. Version 1</p>
       </header>
     </div>
   );
