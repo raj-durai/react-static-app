@@ -19,7 +19,8 @@
     "eject": "react-scripts eject",
     "cypress:open": "cypress open",
     "cy:run": "cypress run",
-    "cy:info": "cypress info"
+    "cy:info": "cypress info",
+    "cy:verify": "cypress verify"
   },
   "eslintConfig": {
     "extends": [
