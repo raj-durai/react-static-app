@@ -3,30 +3,55 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 12
+      nodejs: latest
     commands:
-      - echo Installing source NPM dependencies...
-      - yarn install
-      - yarn add wait-on pm2
-      - apt-get update -y && apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
-      - yarn add mocha mochawesome mochawesome-merge mochawesome-report-generator
-      - npx pm2 start npm -- start
-      - 'npx wait-on http://localhost:3000'
+      # Set COMMIT_INFO variables to send Git specifics to Cypress Dashboard when recording
+      # https://docs.cypress.io/guides/continuous-integration/introduction#Git-information
+      - export COMMIT_INFO_BRANCH="$(git rev-parse HEAD | xargs git name-rev | cut -d' ' -f2 | sed 's/remotes\/origin\///g')"
+      - export COMMIT_INFO_MESSAGE="$(git log -1 --pretty=%B)"
+      - export COMMIT_INFO_EMAIL="$(git log -1 --pretty=%ae)"
+      - export COMMIT_INFO_AUTHOR="$(git log -1 --pretty=%an)"
+      - export COMMIT_INFO_SHA="$(git log -1 --pretty=%H)"
+      - export COMMIT_INFO_REMOTE="$(git config --get remote.origin.url)"
+      - npm ci
   pre_build:
     commands:
-      - 'npx cypress run --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"'
+      - npm run cy:verify
+      - npm run cy:info
   build:
     commands:
-      - npx mochawesome-merge cypress/report/mochawesome-report/mochawesome*.json > cypress/report/mochawesome.json
-      - npx pm2 kill
-      - echo Build started on `date`
-      - yarn build
+      - npm run start:ci &
+      - npx cypress run --record
+      
+# version: 0.2
 
-artifacts:
-  base-directory: ./build
-  files:
-    - '**/*'
+# phases:
+#   install:
+#     runtime-versions:
+#       nodejs: 12
+#     commands:
+#       - echo Installing source NPM dependencies...
+#       - yarn install
+#       - yarn add wait-on pm2
+#       - apt-get update -y && apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
+#       - yarn add mocha mochawesome mochawesome-merge mochawesome-report-generator
+#       - npx pm2 start npm -- start
+#       - 'npx wait-on http://localhost:3000'
+#   pre_build:
+#     commands:
+#       - 'npx cypress run --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"'
+#   build:
+#     commands:
+#       - npx mochawesome-merge cypress/report/mochawesome-report/mochawesome*.json > cypress/report/mochawesome.json
+#       - npx pm2 kill
+#       - echo Build started on `date`
+#       - yarn build
 
-cache:
-  paths:
-    - './node_modules/**/*'
+# artifacts:
+#   base-directory: ./build
+#   files:
+#     - '**/*'
+
+# cache:
+#   paths:
+#     - './node_modules/**/*'
