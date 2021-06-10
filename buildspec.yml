@@ -13,6 +13,7 @@ phases:
       - export COMMIT_INFO_AUTHOR="$(git log -1 --pretty=%an)"
       - export COMMIT_INFO_SHA="$(git log -1 --pretty=%H)"
       - export COMMIT_INFO_REMOTE="$(git config --get remote.origin.url)"
+      - npm install
       - npm ci
   pre_build:
     commands:
@@ -22,7 +23,7 @@ phases:
     commands:
       - npm run start:ci &
       - npx cypress run --record
-      
+
 # version: 0.2
 
 # phases:
